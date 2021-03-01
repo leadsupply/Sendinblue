@@ -40,7 +40,7 @@ class Template
     /**
      * SendinBlue SMTP instance.
      *
-     * @var \SendinBlue\Client\Api\SMTPApi
+     * @var \SendinBlue\Client\Api\TransactionalEmailsApi
      */
     protected $instance;
 
@@ -61,7 +61,7 @@ class Template
      */
     public function __construct(Client $api_client, TemplateTransportContract $transport)
     {
-        $this->instance  = $api_client->getApi('SMTPApi');
+        $this->instance  = $api_client->getApi('TransactionalEmailsApi');
         $this->transport = $transport;
 
         $this->reset();
@@ -95,7 +95,7 @@ class Template
         {
             $instance = app()->make(static::class);
             call_user_func($callable, $instance);
-            $instance->send($template_id);
+            return $instance->send($template_id);
         }
         else
             return $this->transport->send($template_id, $this);
@@ -259,7 +259,7 @@ class Template
     protected function setAddress($address, $name = null, $property = 'to')
     {
 
-    	if ($property === 'replyTo') {
+    	if ($property === 'replyTo' || $property === 'from') {
 
 			$this->model->{$property} = [
 				'name'    => $name ?? null,

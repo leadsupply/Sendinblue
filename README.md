@@ -11,15 +11,34 @@ A Laravel package that provides transactional features like:
 
 ## Installation
 
-        composer require juanparati/sendinblue
+For Laravel 8.x
 
-For Laravel 5.5 it is required to register the service provider into the "config/app.php":
+        composer require juanparati/sendinblue "^8.0"
+
+For Laravel 7.x:
+
+        composer require juanparati/sendinblue "^4.0"
+
+
+For Laravel 6.x:
+
+        composer require juanparati/sendinblue "^3.0"
+
+
+For Laravel 5.5 to 5.8:
+
+        composer require juanparati/sendinblue "^2.4"
+        
+
+
+For Laravel 5.5 and below it's required to register the service provider into the "config/app.php":
 
         Juanparati\Sendinblue\ServiceProvider::class,
 
 For Laravel 5.6+ the service provider is automatically registered.
 
-## <a name="setup-native-mail-transport"></a> Setup native mail transport
+
+## <a name="setup-native-mail-transport"></a> Setup native mail transport in Laravel 7+
 
 1. Add the following configuration snippet into the "config/services.php" file
 
@@ -29,7 +48,31 @@ For Laravel 5.6+ the service provider is automatically registered.
                 ]
          ],
 
-2. Change the mail driver to "sendinblue.v3" into the "config/mail.php" file or the ".env" file. Example:
+2. Change the mail driver to "sendinblue.v3" into the "config/mail.php" file or the ".env" file (Remember that ".env" values will overwrite the config values). Example:
+        
+         'driver' => env('MAIL_MAILER', 'sendinblue'),
+
+         'mailers' => [
+                 // ...
+                 'sendinblue' => [
+                        'transport' => 'sendinblue.v3'
+                 ]
+                 // ...
+         ];
+        
+
+
+## <a name="setup-native-mail-transport"></a> Setup native mail transport in Laravel 5.x/6
+
+1. Add the following configuration snippet into the "config/services.php" file
+
+         'sendinblue' => [        
+                'v3'    => [
+                    'key'   => '[your v3 api key]'                    
+                ]
+         ],
+
+2. Change the mail driver to "sendinblue.v3" into the "config/mail.php" file or the ".env" (Remember that ".env" values will overwrite the config values) file. Example:
         
          'driver' => env('MAIL_DRIVER', 'sendinblue.v3'),
          
@@ -40,9 +83,8 @@ For Laravel 5.6+ the service provider is automatically registered.
 
 ### Transactional mail transport
 
-Just use the transactional e-mails using the [Laravel Mail facade](https://laravel.com/docs/5.6/mail#sending-mail).
+Just use the transactional e-mails using the [Laravel Mail facade](https://laravel.com/docs/8.x/mail#sending-mail).
 
-Remember to [setup the native mail transport](#setup-native-mail-transport) if you want to use Sendinblue as Laravel mail transport.
 
 As soon that Sendinblue was configured as native mail transport you can use the following code in order to test it:
 
@@ -59,11 +101,11 @@ As soon that Sendinblue was configured as native mail transport you can use the 
 
 The transactional mail template transport allow to send templates as transactional e-mails using Sendinblue.
 
-It is possible to register the mail template transport facade into the "config/app.php":
+It's possible to register the mail template transport facade into the "config/app.php":
 
          'MailTemplate' => Juanparati\Sendinblue\Facades\Template::class,
 
-Now it is possible to send templates in the following way:
+Now it's possible to send templates in the following way:
 
         MailTemplate::to('user@example.net');           // Recipient
         MailTemplate::cc('user2@example.net');          // CC
@@ -74,7 +116,7 @@ Now it is possible to send templates in the following way:
         MailTemplate::attachURL('http://www.example.com/file.txt'); // Attach file from URL
         MailTemplate::send(100);                        // Send template ID 100 and return message ID in case of success
 
-It is possible the reset the template message using the "reset" method:
+It's possible the reset the template message using the "reset" method:
 
         MailTemplate::to('user@example.net');           // Recipient
         MailTemplate::cc('user5@example.net');          // Second recipient
@@ -90,7 +132,7 @@ It is possible the reset the template message using the "reset" method:
         MailTemplate::send(100);                        // Send template but previous attribute and second recipient is not used.
                 
 
-In is also possible enclose the mail message into a closure so it is not necessary to reset the message state using the "reset" method:
+It's also possible enclose the mail message into a closure so the call to the "reset" method is not neccesary:
 
         MailTemplate::send(100, function ($message) {
             $message->to('user2@example.net');
@@ -106,7 +148,7 @@ In is also possible enclose the mail message into a closure so it is not necessa
 
 The transactional SMS allow to send SMS using the Sendinblue SMS transport.
 
-It is possible to register the SMS transport facade into the "config/app.php":
+I's possible to register the SMS transport facade into the "config/app.php":
 
         'SMS' => Juanparati\Sendinblue\Facades\SMS::class,
 
@@ -152,4 +194,24 @@ In order to interact with the official library it is posible to inject the custo
         // Retrieve the first 10 folders
         $folders = $contacts_api->getFolders(10, 0);  
 
+Another example using Sendinblue models:
+
+        $apiClient = app()->make(\Juanparati\Sendinblue\Client::class);
+        $contactsApi = $apiClient->getApi('ContactsApi');
+
+        // Use CreateContact model
+        $contact = $apiClient->getModel('CreateContact', ['email' => 'test@example.net', 'attributes' => ['TYPE' => 4, 'NOM' => 'test', 'PRENOM' => 'test'], 'listIds' => [22]]);
+
+        try {
+                $contactsApi->createContact($contact);
+        }
+        catch(\Exception $e){
+                dd($e->getMessage());
+        }
+
 See the [Sendinblue v3 APIs](https://github.com/sendinblue/APIv3-php-library) for more details.    
+
+
+### Supported by
+
+This project was made possible by [Matchbanker.no](https://matchbanker.no/).

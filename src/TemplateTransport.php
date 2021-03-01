@@ -29,7 +29,7 @@ class TemplateTransport implements SendinblueTemplateTransportContract
     /**
      * SendinBlue SMTP instance.
      *
-     * @var \SendinBlue\Client\Api\SMTPApi
+     * @var \SendinBlue\Client\Api\TransactionalEmailsApi
      */
     protected $instance;
 
@@ -41,7 +41,7 @@ class TemplateTransport implements SendinblueTemplateTransportContract
      */
     public function __construct(Client $api_client)
     {
-        $this->instance = $api_client->getApi('SMTPApi');
+        $this->instance = $api_client->getApi('TransactionalEmailsApi');
     }
 
 
@@ -74,7 +74,7 @@ class TemplateTransport implements SendinblueTemplateTransportContract
             throw new TransportException('Unable to send e-mail template, due to unknown error');
 
 
-        Log::debug('Sent Sendinblue template message', ['messageId' => $message_id]);
+        // Log::debug('Sent Sendinblue template message', ['messageId' => $message_id]);
 
 
         return $message_id;
@@ -108,7 +108,7 @@ class TemplateTransport implements SendinblueTemplateTransportContract
 
         // Set BCC
         if ($message->bcc)
-            $mailer->setBcc(static::collectEmailNamePair($message->cc, SendSmtpEmailBcc::class));
+            $mailer->setBcc(static::collectEmailNamePair($message->bcc, SendSmtpEmailBcc::class));
 
 
         // Set ReplyTo

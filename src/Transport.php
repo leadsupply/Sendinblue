@@ -35,7 +35,7 @@ class Transport extends MailTransport
     /**
      * SendinBlue SMTP instance.
      *
-     * @var \SendinBlue\Client\Api\SMTPApi
+     * @var \SendinBlue\Client\Api\TransactionalEmailsApi
      */
     protected $instance;
 
@@ -47,7 +47,7 @@ class Transport extends MailTransport
      */
     public function __construct(Client $api_client)
     {
-        $this->instance = $api_client->getApi('SMTPApi');
+        $this->instance = $api_client->getApi('TransactionalEmailsApi');
     }
 
 
@@ -79,7 +79,7 @@ class Transport extends MailTransport
             throw new TransportException('Unable to send e-mail, due to unknown error');
 
 
-        Log::debug('Sent Sendinblue message', ['messageId' => $response->getMessageId()]);
+        // Log::debug('Sent Sendinblue message', ['messageId' => $response->getMessageId()]);
 
 
         return 1;
